@@ -24,13 +24,31 @@ class Blog {
 }
 // BlogManager Class - จัดการ array บล็อก
 class BlogManager {
+  // สร้างตัวแปรสำหรับใช้ใน class
   constructor() {
-    this.blogs = [];
+    // โหลดข้อมูลจาก Local Storage
+    this.loadBlogs(); 
   }
+
+  loadBlogs() {
+    const storedBlogs = JSON.parse(localStorage.getItem("blogs")) || [];
+    this.blogs = storedBlogs.map(
+      // สร้างเป็น object Blog เก็บไว้ที่ this.blogs
+      (blog) => new Blog(blog.id, blog.title, blog.content) 
+    );
+    this.sortBlogs();
+  }
+
+  save() {
+    // บันทึกลงใน local storage 
+    localStorage.setItem("blogs", JSON.stringify(this.blogs));
+  }
+
   addBlog(title, content) {
     const blog = new Blog(Date.now(), title, content);
     this.blogs.push(blog);
     this.sortBlogs();
+    this.save();
     return blog;
   }
   updateBlog(id, title, content) {
@@ -39,16 +57,21 @@ class BlogManager {
       blog.update(title, content);
       this.sortBlogs();
     }
+    this.save();
     return blog;
   }
   deleteBlog(id) {
     this.blogs = this.blogs.filter((blog) => blog.id !== id);
+    this.save();
   }
+
   getBlog(id) {
     return this.blogs.find((blog) => blog.id === id);
   }
+  // จัดเรียงเวลา มาก - น้อย
   sortBlogs() {
     this.blogs.sort((a, b) => b.updatedDate - a.updatedDate);
+    this.save();
   }
 }
 // UI Class - จัดการ DOM และ Event
@@ -71,6 +94,7 @@ class BlogUI {
   initEventListeners() {
     // จัดการ submit form
     this.form.addEventListener("submit", (e) => {
+      // ไม่ส่งค่าไปที่ sever
       e.preventDefault();
       this.handleSubmit();
     });
@@ -129,7 +153,9 @@ class BlogUI {
     ${blog.content.replace(/\n/g, "<br>")}
     </div>
     <div class="blog-actions">
-    <button class="btn-edit" onclick="blogUI.editBlog(${blog.id})">แก้ไข</button>
+    <button class="btn-edit" onclick="blogUI.editBlog(${
+      blog.id
+    })">แก้ไข</button>
     <button class="btn-delete" onclick="blogUI.deleteBlog(${
       blog.id
     })">ลบ</button>
