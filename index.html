@@ -15,9 +15,14 @@
         <input type="hidden" id="edit-id" />
         <input type="text" id="title" placeholder="หัวข้อ" required />
         <textarea id="content" placeholder="เนื้อหา" required></textarea>
+        <input type="text" id="tags" placeholder="แท็ก (คั่นด้วย ,)">
         <button type="submit" class="btn-submit">บันทึก</button>
         <button type="button" id="cancel-btn" class="hidden">ยกเลิก</button>
       </form>
+      <select class="selector" id="tag-filter">
+        <option value="">-- เลือกแท็ก --</option>
+      </select>
+
     </div>
     <!-- รายการบล็อก -->
     <div id="blog-list">
